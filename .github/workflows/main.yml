@@ -1,0 +1,61 @@
+# .github/workflows/workflow.yml
+
+name: Francinette + Norminette Tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run_francinette_and_norminette:
+    name: Run Francinette & Norminette
+    runs-on: ubuntu-latest
+
+    env:
+      TERM: xterm
+
+    steps:
+      # 1. Projeyi checkout et
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Sistem bağımlılıklarını yükle: git, build-essential, Python3 ve pip
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git build-essential python3 python3-pip
+
+      # BURASI OPSIYONEL MAKEFILE'IN VARLIĞI VE İÇERİĞİNE BAĞLI
+      - name: Run Makefile
+        run: |
+          make fclean
+          make
+          make clean
+
+      # 3. Python paketlerini yükle: gitpython, halo, toml ve norminette
+      #    - gitpython, halo, toml: Francinette’in çalışması için
+      #    - norminette: 42 School stil kontrol aracı
+      - name: Install Python dependencies
+        run: |
+          pip3 install --upgrade pip setuptools
+          pip3 install gitpython halo toml norminette
+
+      # 4. Eğer pip norminette’i ~/.local
+      #    (GitHub Actions ortamında ~/.local/bin, varsayılan olarak PATH’te olmayabilir)
+      - name: Add pip local bin to PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      # 5. Francinette
+      - name: Clone francinette outside workspace
+        run: |
+          bash -c "$(curl -fsSL https://raw.github.com/xicodomingues/francinette/master/bin/install.sh)"
+
+      # 5.1 Add Francinette bin to PATH
+      - name: Add Francinette bin to PATH
+        run: echo "$HOME/francinette" >> $GITHUB_PATH
+
+      # 6. Çalışma dizinini repo köküne (github.workspace) ayarla ve Francinette'i çalıştır
+      #    Bu sayede "Use francinette or paco inside a project folder to run it" kuralına uyuyoruz.
+      - name: Run francinette tests
+        working-directory: ${{ github.workspace }}
+        run: |
+          $HOME/francinette/tester.sh
