@@ -1,7 +1,7 @@
 NAME = libft.a
 
 CC = cc
-CFLAGS = -Wall -Werror -Wextra I.
+CFLAGS = -Wall -Werror -Wextra
 RM = rm -f
 
 SRCS = ft_isalpha.c ft_isdigit.c ft_isalnum.c \
@@ -20,8 +20,7 @@ BONUS = ft_lstnew_bonus.c ft_lstadd_front_bonus.c ft_lstsize_bonus.c \
 OBJS = $(SRCS:.c=.o)
 BONUS_OBJS = $(BONUS:.c=.o)
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+
 
 all: $(NAME)
 
